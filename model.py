@@ -7,6 +7,8 @@ from torchvision import datasets, transforms
 class LeNet(nn.Module):
     def __init__(self):
         super().__init__()
+
+        # convolutional and pooling layers
         self.conv_pool = nn.Sequential(
             nn.Conv2d(1,6,5,padding=2),
             nn.ReLU(),
@@ -15,7 +17,11 @@ class LeNet(nn.Module):
             nn.ReLU(),
             nn.AvgPool2d(2,stride=2),
         )
+
+        # flatten the data
         self.flatten = nn.Flatten()
+
+        # fully connected layers
         self.fully_conn = nn.Sequential(
             nn.Linear(16*5*5, 120),
             nn.ReLU(),
@@ -59,5 +65,3 @@ class LeNet_dropout(nn.Module):
         x = self.flatten(x)
         logits = self.fully_conn(x)
         return logits
-
-# peak accuracy 89ish% again, started overfitting after a few dozen epochs 
