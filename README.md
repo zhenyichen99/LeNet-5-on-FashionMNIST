@@ -4,8 +4,8 @@
 This project trains the LeNet-5 convolutional network and a dropout varation on the FashionMNIST dataset. The LeNet-5 architecture was published in [Gradient-based learning applied to document recognition](https://hal.science/hal-03926082/document) by LeCun et al. The networks are trained using the [AdamW](https://optimization.cbe.cornell.edu/index.php?title=AdamW) optimizer, with early stopping.
 
 ## Files
-`model.py` defines the LeNet-5 model and its dropout variant
-`train_test.py` contains the training and testing loops, as well as the epoch loop with early stopping
+`model.py` defines the LeNet-5 model and its dropout variant  
+`train_test.py` contains the training and testing loops, as well as the epoch loop with early stopping  
 `run.ipynb` is a demo comparing LeNet-5 and the dropout variant
 
 ## Findings
