@@ -1,18 +1,17 @@
 import torch
-from torch import nn
 import matplotlib.pyplot as plt
 
 def train(dataloader, model, loss_fn, optimizer, device):
 
-    size = len(dataloader.dataset)
     model.train()
+    size = len(dataloader.dataset)
     train_loss = 0
 
-    for batch, (X, y) in enumerate(dataloader):
+    for x, y in dataloader:
 
         # propagate forward
-        X, y = X.to(device), y.to(device)
-        logits = model(X)
+        x, y = x.to(device), y.to(device)
+        logits = model(x)
         loss = loss_fn(logits, y)
         train_loss += loss.item()
 
@@ -34,9 +33,9 @@ def test(dataloader, model, loss_fn, device):
 
     # testing
     with torch.no_grad():
-        for X, y in dataloader:
-            X, y = X.to(device), y.to(device)
-            logits = model(X)
+        for x, y in dataloader:
+            x, y = x.to(device), y.to(device)
+            logits = model(x)
             test_loss += loss_fn(logits, y).item()
             correct += (logits.argmax(1) == y).type(torch.float).sum().item()
 
