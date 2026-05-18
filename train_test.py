@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 def train(dataloader, model, loss_fn, optimizer, device):
 
     model.train()
-    size = len(dataloader.dataset)
+    n_batches = len(dataloader)
     train_loss = 0
 
     for x, y in dataloader:
@@ -17,17 +17,20 @@ def train(dataloader, model, loss_fn, optimizer, device):
 
         # backpropagate
         loss.backward()
+        # for param in model.parameters():
+        #     print(param.grad)
         optimizer.step()
         optimizer.zero_grad()
 
-    # return avg train loss per sample
-    train_loss /= size
+    # return avg train loss
+    train_loss /= n_batches
     return train_loss
 
 
 def test(dataloader, model, loss_fn, device):
 
     model.eval()
+    n_batches = len(dataloader)
     size = len(dataloader.dataset)
     test_loss, correct = 0, 0
 
@@ -39,8 +42,8 @@ def test(dataloader, model, loss_fn, device):
             test_loss += loss_fn(logits, y).item()
             correct += (logits.argmax(1) == y).type(torch.float).sum().item()
 
-    # return avg test loss per sample and accuracy
-    test_loss /= size
+    # return avg test loss and accuracy
+    test_loss /= n_batches
     correct /= size
     return test_loss, correct*100
 
@@ -62,7 +65,7 @@ def early_stop(train_dataloader, test_dataloader, model, loss_fn, optimizer, dev
         train_loss = train(train_dataloader, model, loss_fn, optimizer, device)
         test_loss, accuracy = test(test_dataloader, model, loss_fn, device)
         if show:
-            print(f'{e+1:<6}|{train_loss:>9.4f}   |{test_loss:>9.4f}  |{accuracy:>9.1f}')
+            print(f'{e+1:<6}|{train_loss:>9.4f}   |{test_loss:>9.4f}  |{accuracy:>9.2f}')
         train_losses.append(train_loss)
         test_losses.append(test_loss)
         accuracies.append(accuracy)
@@ -79,7 +82,10 @@ def early_stop(train_dataloader, test_dataloader, model, loss_fn, optimizer, dev
 
     # report best epoch and corresponding accuracy
     best_epoch = e-patience
-    print(f'Epoch {best_epoch} has minimum test loss, with test accuracy {(final_accuracy):>.1f}%.')
+    max_accuracy = max(accuracies)
+    most_accurate_epoch = accuracies.index(max_accuracy) + 1
+    print(f'Minimum test loss is {min_loss:.4f}, achieved at epoch {best_epoch}, with test accuracy {(final_accuracy):>.2f}%.')
+    print(f'Maximum test accuracy is {(max_accuracy):>.2f}%, achieved at epoch {most_accurate_epoch}.')
     torch.save(params, 'LeNet5.pth')
 
     # plot train/test loss and test accuracy
@@ -96,6 +102,7 @@ def early_stop(train_dataloader, test_dataloader, model, loss_fn, optimizer, dev
     plt.subplot(2,1,2)
     plt.plot(epochs, accuracies, 'r', label='test accuracy')
     plt.plot(best_epoch, final_accuracy, 'r*')
+    plt.plot(most_accurate_epoch, max_accuracy, 'r^')
     plt.xlabel('epoch')
     plt.ylabel('accuracy (%)')
     plt.legend()
